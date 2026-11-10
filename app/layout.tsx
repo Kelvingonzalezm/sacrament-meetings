@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -28,7 +29,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col">
         <Header />
-        <NavLinks />
+        <Suspense
+          fallback={
+            <nav className="border-b border-emerald-100 bg-white">
+              <div className="mx-auto flex max-w-6xl gap-5 px-6 py-3">
+                <span>Home</span>
+                <span>Meetings</span>
+                <span>Current Meeting</span>
+              </div>
+            </nav>
+          }
+        >
+          <NavLinks />
+        </Suspense>
         <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-5">
           {children}
         </main>
