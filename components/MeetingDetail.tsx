@@ -23,9 +23,9 @@ export default function MeetingDetail({ meeting }: MeetingDetailProps) {
       <div className="mb-6 flex justify-end print:hidden">
         <PrintButton />
       </div>
-	    <div className="mb-8 border-b border-gray-200 pb-6">
+      <div className="mb-8 border-b border-gray-200 pb-6">
         <p className="text-sm font-semibold uppercase tracking-widest text-emerald-700">
-          Sacrament Meeting
+          {meeting.meetingType.charAt(0).toUpperCase() + meeting.meetingType.slice(1)} Meeting
         </p>
 
         <h1 className="mt-2 text-3xl font-bold text-gray-900">
