@@ -19,9 +19,9 @@ export default async function CurrentMeetingPage() {
     String(currentSunday.getDate()).padStart(2, "0"),
   ].join("-");
 
-  const currentMeeting = meetings
-    .filter((meeting) => meeting.date <= sundayDate)
-    .sort((a, b) => b.date.localeCompare(a.date))[0];
+  const currentMeeting = meetings.find(
+    (meeting) => meeting.date === sundayDate
+  );
 
   if (!currentMeeting) {
     redirect("/meetings");
