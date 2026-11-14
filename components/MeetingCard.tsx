@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import type { SacramentMeeting } from "@/lib/types";
 
@@ -6,13 +7,15 @@ interface MeetingCardProps {
 }
 
 export default function MeetingCard({ meeting }: MeetingCardProps) {
-  const formattedDate = new Date(
-    `${meeting.date}T00:00:00`
-  ).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const formattedDate = new Date(meeting.date).toLocaleDateString(
+    "en-US",
+    {
+      timeZone: "UTC",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    },
+  );
 
   return (
     <article className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">

@@ -1,104 +1,78 @@
+
+import { neon } from "@neondatabase/serverless";
 import type { SacramentMeeting } from "./types";
 
-const meetings: SacramentMeeting[] = [
-  {
-    id: 1,
-    date: "2026-11-08",
-    meetingType: "regular",
-    presiding: "Bishop John Smith",
-    conducting: "Brother David Brown",
-    announcements: ["Ward activity next Saturday."],
-    openingHymn: { number: 2, title: "The Spirit of God" },
-    openingPrayer: "Brother Michael Davis",
-    wardBusiness: [{ description: "Sustain new ward leaders." }],
-    stakeBusiness: false,
-    sacramentHymn: { number: 169, title: "As Now We Take the Sacrament" },
-    speakers: [
-      { name: "Sister Mary Johnson", topic: "Faith in Jesus Christ", type: "speaker" },
-      { name: "Ward Choir", topic: "I Know That My Redeemer Lives", type: "musical-number" },
-    ],
-    closingHymn: { number: 100, title: "Nearer, My God, to Thee" },
-    closingPrayer: "Brother Robert Wilson",
-  },
-  {
-    id: 2,
-    date: "2026-11-01",
-    meetingType: "testimony",
-    presiding: "Bishop John Smith",
-    conducting: "Brother David Brown",
-    announcements: ["Fast Sunday."],
-    openingHymn: { number: 6, title: "Redeemer of Israel" },
-    openingPrayer: "Sister Anna White",
-    wardBusiness: [],
-    stakeBusiness: false,
-    sacramentHymn: { number: 181, title: "Jesus of Nazareth, Savior and King" },
-    speakers: [
-      { name: "Ward Members", topic: "Personal testimonies", type: "speaker" },
-    ],
-    closingHymn: { number: 96, title: "Dearest Children, God Is Near You" },
-    closingPrayer: "Brother Peter Green",
-  },
-  {
-    id: 3,
-    date: "2026-10-25",
-    meetingType: "regular",
-    presiding: "Bishop John Smith",
-    conducting: "Brother David Brown",
-    announcements: ["Youth activity on Wednesday."],
-    openingHymn: { number: 19, title: "We Thank Thee, O God, for a Prophet" },
-    openingPrayer: "Brother James Taylor",
-    wardBusiness: [{ description: "Welcome new ward members." }],
-    stakeBusiness: false,
-    sacramentHymn: { number: 188, title: "Thy Will, O Lord, Be Done" },
-    speakers: [
-      { name: "Brother Daniel Lee", topic: "Service and love", type: "speaker" },
-      { name: "Sister Emily Clark", topic: "Gratitude", type: "speaker" },
-    ],
-    closingHymn: { number: 98, title: "I Need Thee Every Hour" },
-    closingPrayer: "Sister Laura Adams",
-  },
-  {
-    id: 4,
-    date: "2026-10-18",
-    meetingType: "stake",
-    presiding: "Stake President Mark Jones",
-    conducting: "Brother David Brown",
-    announcements: ["Stake conference preparation."],
-    openingHymn: { number: 27, title: "Praise to the Lord, the Almighty" },
-    openingPrayer: "Brother Thomas King",
-    wardBusiness: [],
-    stakeBusiness: true,
-    sacramentHymn: { number: 100, title: "Nearer, My God, to Thee" },
-    speakers: [
-      { name: "Stake President Mark Jones", topic: "Strengthening families", type: "speaker" },
-    ],
-    closingHymn: { number: 135, title: "My Redeemer Lives" },
-    closingPrayer: "Sister Rachel Moore",
-  },
-  {
-    id: 5,
-    date: "2026-10-11",
-    meetingType: "general",
-    presiding: "Elder Paul Anderson",
-    conducting: "Brother David Brown",
-    announcements: ["General meeting."],
-    openingHymn: { number: 1, title: "The Morning Breaks" },
-    openingPrayer: "Brother Samuel Hill",
-    wardBusiness: [],
-    stakeBusiness: true,
-    sacramentHymn: { number: 174, title: "While of These Emblems We Partake" },
-    speakers: [
-      { name: "Elder Paul Anderson", topic: "Discipleship", type: "speaker" },
-    ],
-    closingHymn: { number: 89, title: "The Lord Is My Shepherd" },
-    closingPrayer: "Brother Henry Scott",
-  },
-];
+const sql = neon(process.env.DATABASE_URL!);
 
-export function getMeetings(): SacramentMeeting[] {
-  return meetings;
+interface MeetingRow {
+  id: number;
+  date: string;
+  meeting_type: SacramentMeeting["meetingType"];
+  presiding: string;
+  conducting: string;
+  announcements: string[] | null;
+  opening_hymn: SacramentMeeting["openingHymn"];
+  opening_prayer: string;
+  ward_business: SacramentMeeting["wardBusiness"] | null;
+  stake_business: boolean;
+  sacrament_hymn: SacramentMeeting["sacramentHymn"];
+  speakers: SacramentMeeting["speakers"] | null;
+  closing_hymn: SacramentMeeting["closingHymn"];
+  closing_prayer: string;
 }
 
-export function getMeetingById(id: number): SacramentMeeting | undefined {
-  return meetings.find((meeting) => meeting.id === id);
+function mapMeeting(row: MeetingRow): SacramentMeeting {
+  return {
+    id: row.id,
+    date: row.date,
+    meetingType: row.meeting_type,
+    presiding: row.presiding,
+    conducting: row.conducting,
+    announcements: row.announcements ?? [],
+    openingHymn: row.opening_hymn,
+    openingPrayer: row.opening_prayer,
+    wardBusiness: row.ward_business ?? [],
+    stakeBusiness: row.stake_business,
+    sacramentHymn: row.sacrament_hymn,
+    speakers: row.speakers ?? [],
+    closingHymn: row.closing_hymn,
+    closingPrayer: row.closing_prayer,
+  };
 }
+
+export async function getMeetings(): Promise<SacramentMeeting[]> {
+  const rows = await sql`
+    SELECT *
+    FROM meetings
+    ORDER BY date DESC
+  `;
+
+  return (rows as unknown as MeetingRow[]).map(mapMeeting);
+}
+
+export async function getMeetingById(
+  id: number,
+): Promise<SacramentMeeting | undefined> {
+  const rows = await sql`
+    SELECT *
+    FROM meetings
+    WHERE id = ${id}
+    LIMIT 1
+  `;
+
+  const row = (rows as unknown as MeetingRow[])[0];
+
+  return row ? mapMeeting(row) : undefined;
+}
+
+// Mutations will be implemented in Week 04.
+export async function addMeeting(
+  _meeting: Omit<SacramentMeeting, "id">,
+): Promise<void> {}
+
+export async function updateMeeting(
+  _id: number,
+  _meeting: Partial<SacramentMeeting>,
+): Promise<void> {}
+
+export async function deleteMeeting(_id: number): Promise<void> {}
