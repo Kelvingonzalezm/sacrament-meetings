@@ -1,4 +1,3 @@
-
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { getMeetings } from "@/lib/meetings-db";
@@ -21,7 +20,7 @@ export default async function CurrentMeetingPage() {
   ].join("-");
 
   const currentMeeting = meetings.find(
-    (meeting) => meeting.date === sundayDate
+    (meeting) => new Date(meeting.date).toISOString().slice(0, 10) === sundayDate
   );
 
   if (!currentMeeting) {
@@ -30,3 +29,4 @@ export default async function CurrentMeetingPage() {
 
   redirect(`/meetings/${currentMeeting.id}`);
 }
+
