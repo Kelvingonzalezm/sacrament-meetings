@@ -1,4 +1,3 @@
-
 import { neon } from "@neondatabase/serverless";
 import type { SacramentMeeting } from "./types";
 
@@ -40,6 +39,7 @@ function mapMeeting(row: MeetingRow): SacramentMeeting {
   };
 }
 
+// Get all meetings
 export async function getMeetings(): Promise<SacramentMeeting[]> {
   const rows = await sql`
     SELECT *
@@ -50,6 +50,7 @@ export async function getMeetings(): Promise<SacramentMeeting[]> {
   return (rows as unknown as MeetingRow[]).map(mapMeeting);
 }
 
+// Get one meeting by ID
 export async function getMeetingById(
   id: number,
 ): Promise<SacramentMeeting | undefined> {
@@ -65,14 +66,88 @@ export async function getMeetingById(
   return row ? mapMeeting(row) : undefined;
 }
 
-// Mutations will be implemented in Week 04.
+// Create a meeting
 export async function addMeeting(
-  _meeting: Omit<SacramentMeeting, "id">,
-): Promise<void> {}
+  meeting: Omit<SacramentMeeting, "id">,
+): Promise<void> {
+  try {
+    await sql`
+      INSERT INTO meetings (
+        date,
+        meeting_type,
+        presiding,
+        conducting,
+        announcements,
+        opening_hymn,
+        opening_prayer,
+        ward_business,
+        stake_business,
+        sacrament_hymn,
+        speakers,
+        closing_hymn,
+        closing_prayer
+      )
+      VALUES (
+        ${meeting.date}::date,
+        ${meeting.meetingType},
+        ${meeting.presiding},
+        ${meeting.conducting},
+        ${meeting.announcements ?? []}::text[],
+        ${JSON.stringify(meeting.openingHymn)}::jsonb,
+        ${meeting.openingPrayer},
+        ${JSON.stringify(meeting.wardBusiness)}::jsonb,
+        ${meeting.stakeBusiness},
+        ${JSON.stringify(meeting.sacramentHymn)}::jsonb,
+        ${JSON.stringify(meeting.speakers)}::jsonb,
+        ${JSON.stringify(meeting.closingHymn)}::jsonb,
+        ${meeting.closingPrayer}
+      )
+    `;
+  } catch (error) {
+    console.error("Error creating meeting:", error);
+    throw new Error("Unable to create the meeting. Please try again.");
+  }
+}
 
+// Update a meeting
 export async function updateMeeting(
-  _id: number,
-  _meeting: Partial<SacramentMeeting>,
-): Promise<void> {}
+  id: number,
+  meeting: Omit<SacramentMeeting, "id">,
+): Promise<void> {
+  try {
+    await sql`
+      UPDATE meetings
+      SET
+        date = ${meeting.date}::date,
+        meeting_type = ${meeting.meetingType},
+        presiding = ${meeting.presiding},
+        conducting = ${meeting.conducting},
+        announcements = ${meeting.announcements ?? []}::text[],
+        opening_hymn = ${JSON.stringify(meeting.openingHymn)}::jsonb,
+        opening_prayer = ${meeting.openingPrayer},
+        ward_business = ${JSON.stringify(meeting.wardBusiness)}::jsonb,
+        stake_business = ${meeting.stakeBusiness},
+        sacrament_hymn = ${JSON.stringify(meeting.sacramentHymn)}::jsonb,
+        speakers = ${JSON.stringify(meeting.speakers)}::jsonb,
+        closing_hymn = ${JSON.stringify(meeting.closingHymn)}::jsonb,
+        closing_prayer = ${meeting.closingPrayer}
+      WHERE id = ${id}
+    `;
+  } catch (error) {
+    console.error("Error updating meeting:", error);
+    throw new Error("Unable to update the meeting. Please try again.");
+  }
+}
 
-export async function deleteMeeting(_id: number): Promise<void> {}
+// Delete a meeting
+export async function deleteMeeting(id: number): Promise<void> {
+  try {
+    await sql`
+      DELETE FROM meetings
+      WHERE id = ${id}
+    `;
+  } catch (error) {
+    console.error("Error deleting meeting:", error);
+    throw new Error("Unable to delete the meeting. Please try again.");
+  }
+}

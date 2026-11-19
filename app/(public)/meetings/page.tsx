@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { connection } from "next/server";
 import { headers } from "next/headers";
 import { Suspense } from "react";
@@ -48,22 +49,22 @@ export default async function MeetingsPage({
   const filteredMeetings = meetings.filter((meeting) => {
     const speakerMatch = filters.speaker
       ? meeting.speakers.some((speaker) =>
-          `${speaker.name} ${speaker.topic}`
-            .toLowerCase()
-            .includes(filters.speaker!.toLowerCase())
-        )
+        `${speaker.name} ${speaker.topic}`
+          .toLowerCase()
+          .includes(filters.speaker!.toLowerCase())
+      )
       : true;
 
     const presidingMatch = filters.presiding
       ? meeting.presiding
-          .toLowerCase()
-          .includes(filters.presiding.toLowerCase())
+        .toLowerCase()
+        .includes(filters.presiding.toLowerCase())
       : true;
 
     const conductingMatch = filters.conducting
       ? meeting.conducting
-          .toLowerCase()
-          .includes(filters.conducting.toLowerCase())
+        .toLowerCase()
+        .includes(filters.conducting.toLowerCase())
       : true;
 
     const typeMatch = filters.type
@@ -95,10 +96,17 @@ export default async function MeetingsPage({
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <p className="text-gray-600">
           Browse previous and upcoming sacrament meetings.
         </p>
+
+        <Link
+          href="/meetings/new"
+          className="rounded-lg bg-emerald-800 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
+        >
+          + Create Meeting
+        </Link>
       </div>
 
       <Suspense fallback={<p>Loading search...</p>}>
