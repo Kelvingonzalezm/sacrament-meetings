@@ -1,3 +1,4 @@
+
 import type { SacramentMeeting } from "@/lib/types";
 import PrintButton from "@/components/PrintButton";
 
@@ -6,14 +7,16 @@ interface MeetingDetailProps {
 }
 
 export default function MeetingDetail({ meeting }: MeetingDetailProps) {
-  const formattedDate = new Date(
-    `${meeting.date}T00:00:00`
-  ).toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const formattedDate = new Date(meeting.date).toLocaleDateString(
+    "en-US",
+    {
+      timeZone: "UTC",
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    },
+  );
 
   return (
     <article
@@ -23,6 +26,7 @@ export default function MeetingDetail({ meeting }: MeetingDetailProps) {
       <div className="mb-6 flex justify-end print:hidden">
         <PrintButton />
       </div>
+
       <div className="mb-8 border-b border-gray-200 pb-6">
         <p className="text-sm font-semibold uppercase tracking-widest text-emerald-700">
           {meeting.meetingType.charAt(0).toUpperCase() + meeting.meetingType.slice(1)} Meeting

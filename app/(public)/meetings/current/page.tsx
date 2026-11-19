@@ -7,7 +7,7 @@ export const instant = false;
 export default async function CurrentMeetingPage() {
   await connection();
 
-  const meetings = getMeetings();
+  const meetings = await getMeetings();
 
   const today = new Date();
   const currentSunday = new Date(today);
@@ -19,9 +19,9 @@ export default async function CurrentMeetingPage() {
     String(currentSunday.getDate()).padStart(2, "0"),
   ].join("-");
 
-  const currentMeeting = meetings
-    .filter((meeting) => meeting.date <= sundayDate)
-    .sort((a, b) => b.date.localeCompare(a.date))[0];
+  const currentMeeting = meetings.find(
+    (meeting) => new Date(meeting.date).toISOString().slice(0, 10) === sundayDate
+  );
 
   if (!currentMeeting) {
     redirect("/meetings");
@@ -29,3 +29,4 @@ export default async function CurrentMeetingPage() {
 
   redirect(`/meetings/${currentMeeting.id}`);
 }
+
