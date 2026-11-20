@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 
 interface ErrorProps {
@@ -22,12 +23,21 @@ export default function AdminError({ error, reset }: ErrorProps) {
                 An unexpected error occurred. Please try again.
             </p>
 
-            <button
-                onClick={() => reset()}
-                className="mt-6 rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-700"
-            >
-                Try Again
-            </button>
+            <div className="mt-6 flex flex-col items-center gap-4">
+                <button
+                    onClick={() => reset()}
+                    className="rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-700"
+                >
+                    Try Again
+                </button>
+
+                <Link
+                    href="/meetings"
+                    className="font-semibold text-emerald-800 underline hover:text-emerald-700"
+                >
+                    Return to Meetings
+                </Link>
+            </div>
         </div>
     );
 }

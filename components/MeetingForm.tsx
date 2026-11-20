@@ -15,7 +15,20 @@ interface MeetingFormProps {
     submitLabel: string;
 }
 
+interface FieldErrorProps {
+    id: string;
+    message: string;
+}
+
 const initialState: MeetingFormState = {};
+
+function FieldError({ id, message }: FieldErrorProps) {
+    return (
+        <p id={id} aria-live="polite" className="mt-1 text-sm text-red-600">
+            {message}
+        </p>
+    );
+}
 
 export default function MeetingForm({
     action,
@@ -60,14 +73,11 @@ export default function MeetingForm({
                             ? new Date(meeting.date).toISOString().slice(0, 10)
                             : ""
                     }
-                    aria-describedby={fieldError("date") ? "date-error" : undefined}
+                    aria-describedby="date-error"
+                    aria-invalid={Boolean(fieldError("date"))}
                     className={inputClass}
                 />
-                {fieldError("date") && (
-                    <p id="date-error" className="mt-1 text-sm text-red-600">
-                        {fieldError("date")}
-                    </p>
-                )}
+                <FieldError id="date-error" message={fieldError("date")} />
             </div>
 
             <div>
@@ -79,6 +89,8 @@ export default function MeetingForm({
                     name="meetingType"
                     required
                     defaultValue={meeting?.meetingType ?? "regular"}
+                    aria-describedby="meetingType-error"
+                    aria-invalid={Boolean(fieldError("meetingType"))}
                     className={inputClass}
                 >
                     <option value="testimony">Testimony</option>
@@ -87,11 +99,7 @@ export default function MeetingForm({
                     <option value="general">General</option>
                     <option value="special">Special</option>
                 </select>
-                {fieldError("meetingType") && (
-                    <p className="mt-1 text-sm text-red-600">
-                        {fieldError("meetingType")}
-                    </p>
-                )}
+                <FieldError id="meetingType-error" message={fieldError("meetingType")} />
             </div>
 
             <div>
@@ -103,14 +111,11 @@ export default function MeetingForm({
                     name="presiding"
                     required
                     defaultValue={meeting?.presiding ?? ""}
+                    aria-describedby="presiding-error"
+                    aria-invalid={Boolean(fieldError("presiding"))}
                     className={inputClass}
-                    aria-describedby={fieldError("presiding") ? "presiding-error" : undefined}
                 />
-                {fieldError("presiding") && (
-                    <p id="presiding-error" className="mt-1 text-sm text-red-600">
-                        {fieldError("presiding")}
-                    </p>
-                )}
+                <FieldError id="presiding-error" message={fieldError("presiding")} />
             </div>
 
             <div>
@@ -122,14 +127,11 @@ export default function MeetingForm({
                     name="conducting"
                     required
                     defaultValue={meeting?.conducting ?? ""}
+                    aria-describedby="conducting-error"
+                    aria-invalid={Boolean(fieldError("conducting"))}
                     className={inputClass}
-                    aria-describedby={fieldError("conducting") ? "conducting-error" : undefined}
                 />
-                {fieldError("conducting") && (
-                    <p id="conducting-error" className="mt-1 text-sm text-red-600">
-                        {fieldError("conducting")}
-                    </p>
-                )}
+                <FieldError id="conducting-error" message={fieldError("conducting")} />
             </div>
 
             <div>
@@ -141,8 +143,11 @@ export default function MeetingForm({
                     name="announcements"
                     rows={3}
                     defaultValue={meeting?.announcements?.join("\n") ?? ""}
+                    aria-describedby="announcements-error"
+                    aria-invalid={Boolean(fieldError("announcements"))}
                     className={inputClass}
                 />
+                <FieldError id="announcements-error" message={fieldError("announcements")} />
             </div>
 
             <fieldset className="space-y-3 rounded-lg border border-gray-200 p-4">
@@ -158,13 +163,11 @@ export default function MeetingForm({
                         min="1"
                         required
                         defaultValue={meeting?.openingHymn.number ?? ""}
+                        aria-describedby="openingHymnNumber-error"
+                        aria-invalid={Boolean(fieldError("openingHymnNumber"))}
                         className={inputClass}
                     />
-                    {fieldError("openingHymnNumber") && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {fieldError("openingHymnNumber")}
-                        </p>
-                    )}
+                    <FieldError id="openingHymnNumber-error" message={fieldError("openingHymnNumber")} />
                 </div>
                 <div>
                     <label htmlFor="openingHymnTitle">Hymn Title</label>
@@ -173,13 +176,11 @@ export default function MeetingForm({
                         name="openingHymnTitle"
                         required
                         defaultValue={meeting?.openingHymn.title ?? ""}
+                        aria-describedby="openingHymnTitle-error"
+                        aria-invalid={Boolean(fieldError("openingHymnTitle"))}
                         className={inputClass}
                     />
-                    {fieldError("openingHymnTitle") && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {fieldError("openingHymnTitle")}
-                        </p>
-                    )}
+                    <FieldError id="openingHymnTitle-error" message={fieldError("openingHymnTitle")} />
                 </div>
             </fieldset>
 
@@ -192,13 +193,11 @@ export default function MeetingForm({
                     name="openingPrayer"
                     required
                     defaultValue={meeting?.openingPrayer ?? ""}
+                    aria-describedby="openingPrayer-error"
+                    aria-invalid={Boolean(fieldError("openingPrayer"))}
                     className={inputClass}
                 />
-                {fieldError("openingPrayer") && (
-                    <p className="mt-1 text-sm text-red-600">
-                        {fieldError("openingPrayer")}
-                    </p>
-                )}
+                <FieldError id="openingPrayer-error" message={fieldError("openingPrayer")} />
             </div>
 
             <div>
@@ -209,24 +208,30 @@ export default function MeetingForm({
                     id="wardBusiness"
                     name="wardBusiness"
                     rows={3}
-                    defaultValue={
-                        meeting?.wardBusiness.map((item) => item.description).join("\n") ?? ""
-                    }
+                    defaultValue={meeting?.wardBusiness.map((item) => item.description).join("\n") ?? ""}
+                    aria-describedby="wardBusiness-error"
+                    aria-invalid={Boolean(fieldError("wardBusiness"))}
                     className={inputClass}
                 />
+                <FieldError id="wardBusiness-error" message={fieldError("wardBusiness")} />
             </div>
 
-            <div className="flex items-center gap-3">
-                <input
-                    id="stakeBusiness"
-                    name="stakeBusiness"
-                    type="checkbox"
-                    defaultChecked={meeting?.stakeBusiness ?? false}
-                    className="h-4 w-4 accent-emerald-800"
-                />
-                <label htmlFor="stakeBusiness" className="font-semibold text-gray-800">
-                    Stake Business will be presented
-                </label>
+            <div>
+                <div className="flex items-center gap-3">
+                    <input
+                        id="stakeBusiness"
+                        name="stakeBusiness"
+                        type="checkbox"
+                        defaultChecked={meeting?.stakeBusiness ?? false}
+                        aria-describedby="stakeBusiness-error"
+                        aria-invalid={Boolean(fieldError("stakeBusiness"))}
+                        className="h-4 w-4 accent-emerald-800"
+                    />
+                    <label htmlFor="stakeBusiness" className="font-semibold text-gray-800">
+                        Stake Business will be presented
+                    </label>
+                </div>
+                <FieldError id="stakeBusiness-error" message={fieldError("stakeBusiness")} />
             </div>
 
             <fieldset className="space-y-3 rounded-lg border border-gray-200 p-4">
@@ -242,13 +247,11 @@ export default function MeetingForm({
                         min="1"
                         required
                         defaultValue={meeting?.sacramentHymn.number ?? ""}
+                        aria-describedby="sacramentHymnNumber-error"
+                        aria-invalid={Boolean(fieldError("sacramentHymnNumber"))}
                         className={inputClass}
                     />
-                    {fieldError("sacramentHymnNumber") && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {fieldError("sacramentHymnNumber")}
-                        </p>
-                    )}
+                    <FieldError id="sacramentHymnNumber-error" message={fieldError("sacramentHymnNumber")} />
                 </div>
                 <div>
                     <label htmlFor="sacramentHymnTitle">Hymn Title</label>
@@ -257,13 +260,11 @@ export default function MeetingForm({
                         name="sacramentHymnTitle"
                         required
                         defaultValue={meeting?.sacramentHymn.title ?? ""}
+                        aria-describedby="sacramentHymnTitle-error"
+                        aria-invalid={Boolean(fieldError("sacramentHymnTitle"))}
                         className={inputClass}
                     />
-                    {fieldError("sacramentHymnTitle") && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {fieldError("sacramentHymnTitle")}
-                        </p>
-                    )}
+                    <FieldError id="sacramentHymnTitle-error" message={fieldError("sacramentHymnTitle")} />
                 </div>
             </fieldset>
 
@@ -283,8 +284,11 @@ export default function MeetingForm({
                             .map((item) => `${item.name} | ${item.topic} | ${item.type}`)
                             .join("\n") ?? ""
                     }
+                    aria-describedby="speakers-error"
+                    aria-invalid={Boolean(fieldError("speakers"))}
                     className={inputClass}
                 />
+                <FieldError id="speakers-error" message={fieldError("speakers")} />
             </div>
 
             <fieldset className="space-y-3 rounded-lg border border-gray-200 p-4">
@@ -300,13 +304,11 @@ export default function MeetingForm({
                         min="1"
                         required
                         defaultValue={meeting?.closingHymn.number ?? ""}
+                        aria-describedby="closingHymnNumber-error"
+                        aria-invalid={Boolean(fieldError("closingHymnNumber"))}
                         className={inputClass}
                     />
-                    {fieldError("closingHymnNumber") && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {fieldError("closingHymnNumber")}
-                        </p>
-                    )}
+                    <FieldError id="closingHymnNumber-error" message={fieldError("closingHymnNumber")} />
                 </div>
                 <div>
                     <label htmlFor="closingHymnTitle">Hymn Title</label>
@@ -315,13 +317,11 @@ export default function MeetingForm({
                         name="closingHymnTitle"
                         required
                         defaultValue={meeting?.closingHymn.title ?? ""}
+                        aria-describedby="closingHymnTitle-error"
+                        aria-invalid={Boolean(fieldError("closingHymnTitle"))}
                         className={inputClass}
                     />
-                    {fieldError("closingHymnTitle") && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {fieldError("closingHymnTitle")}
-                        </p>
-                    )}
+                    <FieldError id="closingHymnTitle-error" message={fieldError("closingHymnTitle")} />
                 </div>
             </fieldset>
 
@@ -334,19 +334,17 @@ export default function MeetingForm({
                     name="closingPrayer"
                     required
                     defaultValue={meeting?.closingPrayer ?? ""}
+                    aria-describedby="closingPrayer-error"
+                    aria-invalid={Boolean(fieldError("closingPrayer"))}
                     className={inputClass}
                 />
-                {fieldError("closingPrayer") && (
-                    <p className="mt-1 text-sm text-red-600">
-                        {fieldError("closingPrayer")}
-                    </p>
-                )}
+                <FieldError id="closingPrayer-error" message={fieldError("closingPrayer")} />
             </div>
 
             <button
                 type="submit"
                 disabled={isPending}
-                className="w-full rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                className="w-full rounded-lg bg-emerald-800 px-5 py-3 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
                 {isPending ? "Saving..." : submitLabel}
             </button>
